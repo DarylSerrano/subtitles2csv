@@ -42,13 +42,14 @@ func main() {
 
 func convertToCsv(fileIn string, outdir string) {
 	extension := filepath.Ext(fileIn)
+	filename := filepath.Base(fileIn)
 	content, err := ioutil.ReadFile(fileIn)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	outFilePath := path.Join(outdir, "out.csv")
-	outFile, err := os.OpenFile(outFilePath, os.O_RDWR|os.O_CREATE, 0766) // For read access.
+	outFile, err := os.OpenFile(outFilePath, os.O_RDWR|os.O_CREATE, 0666) // For read access.
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -80,7 +81,7 @@ func convertToCsv(fileIn string, outdir string) {
 
 	for _, caption := range res.Captions {
 		for _, line := range caption.Text {
-			record := []string{fileIn, line, ""}
+			record := []string{filename, line, ""}
 			if err := writterOutFile.Write(record); err != nil {
 				log.Fatalln("error writing record to csv:", err)
 			}
