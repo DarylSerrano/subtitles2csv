@@ -1,7 +1,10 @@
 # About
 A simple cli tool for converting subtitle files into csv files
 # Instalation
-`go install github.com/DarylSerrano/subtitles2csv`
+```
+$ go get -u github.com/DarylSerrano/subtitles2csv
+$ go install github.com/DarylSerrano/subtitles2csv
+```
 # Usage
 ```
 $ subtitles2csv --infile "subtitles.srt"
