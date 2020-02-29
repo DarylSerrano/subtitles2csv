@@ -17,7 +17,7 @@ import (
 func main() {
 	dir, err := os.Getwd()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 
 	infilePtr := flag.String("infile", "", "Path to the subtitle file to convert into csv")
@@ -32,7 +32,7 @@ func main() {
 	if *outpathPtr != dir {
 		absPath, err := filepath.Abs(*outpathPtr)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalln(err)
 		}
 		outpathPtr = &absPath
 	}
@@ -43,15 +43,16 @@ func main() {
 func convertToCsv(fileIn string, outdir string) {
 	extension := filepath.Ext(fileIn)
 	filename := filepath.Base(fileIn)
+	outfilename := strings.Replace(filename, extension, ".csv", -1)
 	content, err := ioutil.ReadFile(fileIn)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 
-	outFilePath := path.Join(outdir, "out.csv")
+	outFilePath := path.Join(outdir, outfilename)
 	outFile, err := os.OpenFile(outFilePath, os.O_RDWR|os.O_CREATE, 0666) // For read access.
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 	defer outFile.Close()
 
@@ -63,17 +64,17 @@ func convertToCsv(fileIn string, outdir string) {
 	if strings.Contains(extension, "srt") {
 		res, err = subtitles.NewFromSRT(contentString)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalln(err)
 		}
 	} else if strings.Contains(extension, "ssa") {
 		res, err = subtitles.NewFromSSA(contentString)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalln(err)
 		}
 	} else if strings.Contains(extension, "vtt") {
 		res, err = subtitles.NewFromVTT(contentString)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalln(err)
 		}
 	} else {
 		log.Fatalln("Please provide a supported extension file: ", extension)
@@ -81,7 +82,7 @@ func convertToCsv(fileIn string, outdir string) {
 
 	for _, caption := range res.Captions {
 		for _, line := range caption.Text {
-			record := []string{filename, line, ""}
+			record := []string{filename, line, caption.Start.Format("15:04:05.000000"), caption.End.Format("15:04:05.000000")}
 			if err := writterOutFile.Write(record); err != nil {
 				log.Fatalln("error writing record to csv:", err)
 			}
@@ -90,7 +91,7 @@ func convertToCsv(fileIn string, outdir string) {
 
 	writterOutFile.Flush()
 	if err := writterOutFile.Error(); err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 
 	fmt.Println("Saved into: ", outFilePath)
